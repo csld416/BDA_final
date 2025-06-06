@@ -25,8 +25,7 @@ def run_spectral(input_csv: str, output_csv: str, cluster_count: int):
     # Run Spectral Clustering
     model = SpectralClustering(
         n_clusters=cluster_count,
-        affinity='nearest_neighbors',
-        n_neighbors=10,
+        affinity='rbf',
         assign_labels='kmeans',
         random_state=42
     )
