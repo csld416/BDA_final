@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+
 import os
 
 def run_clustering(input_csv: str, output_csv: str):
@@ -26,8 +28,8 @@ def run_clustering(input_csv: str, output_csv: str):
     print(f"[INFO] Clustering into {n_clusters} clusters")
 
     # Step 4: Cluster
-    kmeans = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
+    gmm = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=42)
+    labels = gmm.fit_predict(X_scaled)
 
     # Step 5: Save to CSV
     df = pd.DataFrame({
