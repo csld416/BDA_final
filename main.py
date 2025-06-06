@@ -1,42 +1,45 @@
-# main.py
-
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
+from sklearn.cluster import SpectralClustering
 import os
 
-def run_clustering(input_csv: str, output_csv: str):
-    # Step 1: Load dataset
-    try:
-        data = pd.read_csv(input_csv)
-    except FileNotFoundError:
-        print(f"[SKIP] {input_csv} not found. Skipping...")
+def run_spectral(input_csv: str, output_csv: str, cluster_count: int):
+    if not os.path.exists(input_csv):
+        print(f"[SKIP] {input_csv} not found.")
         return
 
-    print(f"[INFO] Processing '{input_csv}' with shape {data.shape}")
+    df = pd.read_csv(input_csv)
 
-    # Step 2: Preprocess
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(data)
+    # Extract only the important features: S2, S3, S4 (i.e., columns 2, 3, 4)
+    try:
+        X = df.iloc[:, [2, 3, 4]]  # assuming no header renaming
+    except:
+        raise ValueError("Ensure the input has at least 5 columns including ID, S1, S2, S3, S4")
 
-    # Step 3: Determine number of clusters
-    n_features = X_scaled.shape[1]
-    n_clusters = 4 * n_features - 1
-    print(f"[INFO] Clustering into {n_clusters} clusters")
+    print(f"[INFO] Clustering {input_csv} → {cluster_count} clusters using SpectralClustering on S2, S3, S4")
 
-    # Step 4: Cluster
-    kmeans = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
+    # Scale the features
+    X_scaled = StandardScaler().fit_transform(X)
 
-    # Step 5: Save to CSV
-    df = pd.DataFrame({
-    'id': np.arange(len(labels)),
-    'label': labels
-    })
-    df.to_csv(output_csv, index=False)
-    print(f"[DONE] Saved labels to '{output_csv}'")
+    # Run Spectral Clustering
+    model = SpectralClustering(
+        n_clusters=cluster_count,
+        affinity='nearest_neighbors',
+        n_neighbors=10,
+        assign_labels='kmeans',
+        random_state=42
+    )
+    labels = model.fit_predict(X_scaled)
+
+    # Output to CSV
+    pd.DataFrame({
+        'id': np.arange(len(labels)),
+        'label': labels
+    }).to_csv(output_csv, index=False)
+
+    print(f"[DONE] Saved {output_csv} (shape: {len(labels)} rows)")
 
 if __name__ == "__main__":
-    run_clustering("public_data.csv", "public_submission.csv")
-    run_clustering("private_data.csv", "private_submission.csv")
+    run_spectral("public_data.csv", "public_submission.csv", 15)
+    run_spectral("private_data.csv", "private_submission.csv", 23)
