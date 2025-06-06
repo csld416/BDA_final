@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans
 import os
 
@@ -25,14 +26,20 @@ def run_clustering(input_csv: str, output_csv: str):
     n_clusters = 4 * n_features - 1
     print(f"[INFO] Clustering into {n_clusters} clusters")
 
-    # Step 4: Cluster
-    kmeans = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
+    # Step 4: Choose algorithm
+    if input_csv == "public_data.csv":
+        print("[INFO] Using GMM for public data")
+        model = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=42)
+        labels = model.fit_predict(X_scaled)
+    else:
+        print("[INFO] Using KMeans for private data")
+        model = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
+        labels = model.fit_predict(X_scaled)
 
     # Step 5: Save to CSV
     df = pd.DataFrame({
-    'id': np.arange(len(labels)),
-    'label': labels
+        'id': np.arange(len(labels)),
+        'label': labels
     })
     df.to_csv(output_csv, index=False)
     print(f"[DONE] Saved labels to '{output_csv}'")
