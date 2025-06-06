@@ -30,7 +30,11 @@ def run_clustering(input_csv: str, output_csv: str):
     labels = kmeans.fit_predict(X_scaled)
 
     # Step 5: Save to CSV
-    pd.DataFrame(labels).to_csv(output_csv, index=False, header=False)
+    df = pd.DataFrame({
+    'id': np.arange(len(labels)),
+    'label': labels
+    })
+    df.to_csv(output_csv, index=False)
     print(f"[DONE] Saved labels to '{output_csv}'")
 
 if __name__ == "__main__":
