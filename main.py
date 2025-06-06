@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 import os
 
 def run_clustering(input_csv: str, output_csv: str):
@@ -26,8 +27,8 @@ def run_clustering(input_csv: str, output_csv: str):
     print(f"[INFO] Clustering into {n_clusters} clusters")
 
     # Step 4: Cluster
-    kmeans = KMeans(n_clusters=n_clusters, n_init='auto', random_state=42)
-    labels = kmeans.fit_predict(X_scaled)
+    clustering = AgglomerativeClustering(n_clusters=n_clusters, linkage='ward')
+    labels = clustering.fit_predict(X_scaled)
 
     # Step 5: Save to CSV
     df = pd.DataFrame({
@@ -39,4 +40,4 @@ def run_clustering(input_csv: str, output_csv: str):
 
 if __name__ == "__main__":
     run_clustering("public_data.csv", "public_submission.csv")
-    run_clustering("private_data.csv", "private_submission.csv")
+    # run_clustering("private_data.csv", "private_submission.csv")
