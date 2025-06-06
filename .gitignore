@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# GitHub-generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# VSCode settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# OS-specific
+*.swp
+*.swo
+
+# Zip archives
+*.zip
+
+# Cache
+*.log
+*.tmp
+
+# Python virtual environments
+*.egg-info/
+dist/
+build/
+
+# Ignore data files
+data/
