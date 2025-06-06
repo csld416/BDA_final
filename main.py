@@ -1,52 +1,37 @@
-# main.py
-
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 import os
 
-def run_clustering(input_csv: str, output_csv: str):
-    # Step 1: Load dataset
-    try:
-        df = pd.read_csv(input_csv)
-    except FileNotFoundError:
-        print(f"[SKIP] {input_csv} not found. Skipping...")
+def cluster_and_save(input_file, output_file, n_clusters):
+    if not os.path.exists(input_file):
+        print(f"[SKIP] {input_file} not found.")
         return
 
-    print(f"[INFO] Loaded '{input_csv}' with shape {df.shape}")
+    df = pd.read_csv(input_file)
+    print(f"[INFO] Loaded {input_file} with shape {df.shape}")
 
-    # Step 2: Scale features
+    # Preprocessing
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(df)
 
-    # Step 3: PCA — preserve 95% of variance
-    n_features = X_scaled.shape[1]
-    print(f"[INFO] Performing PCA on {n_features}-dimensional data (retain 95% variance)")
-    pca = PCA(n_components=0.95, random_state=42)
+    # PCA to reduce noise
+    pca = PCA(n_components=min(X_scaled.shape[1], 3))
     X_pca = pca.fit_transform(X_scaled)
-    comp = X_pca.shape[1]
-    explained = np.sum(pca.explained_variance_ratio_)
-    print(f"[INFO] PCA reduced to {comp} components, explained variance = {explained:.4f}")
 
-    # Step 4: Determine k = 4n – 1 (based on original dims)
-    k = 4 * n_features - 1
-    print(f"[INFO] Clustering into {k} clusters (4 × {n_features} - 1)")
+    # GMM clustering
+    gmm = GaussianMixture(n_components=n_clusters, covariance_type='full', random_state=42)
+    labels = gmm.fit_predict(X_pca)
 
-    # Step 5: KMeans with more inits
-    print("[INFO] Fitting KMeans (n_init=20, random_state=42)")
-    km = KMeans(n_clusters=k, n_init=20, random_state=42)
-    labels = km.fit_predict(X_pca)
-
-    # Step 6: Save to CSV (id,label)
-    out_df = pd.DataFrame({
+    # Save results
+    pd.DataFrame({
         'id': np.arange(len(labels)),
         'label': labels
-    })
-    out_df.to_csv(output_csv, index=False)
-    print(f"[DONE] Saved labels to '{output_csv}'\n")
+    }).to_csv(output_file, index=False)
+    print(f"[DONE] Saved results to {output_file}")
 
 if __name__ == "__main__":
-    run_clustering("public_data.csv",  "public_submission.csv")
-    run_clustering("private_data.csv", "private_submission.csv")
+    cluster_and_save("public_data.csv", "public_submission.csv", n_clusters=15)
+    cluster_and_save("private_data.csv", "private_submission.csv", n_clusters=23)
