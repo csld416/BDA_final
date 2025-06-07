@@ -4,7 +4,7 @@ from grader import score
 from pathlib import Path
 
 # Setup
-input_dir = Path("submission_hdbscan_fine")
+input_dir = Path("submission_hdbscan_raw")
 log_file = Path("score_log.csv")
 public_file = Path("public_submission.csv")
 

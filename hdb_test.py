@@ -10,21 +10,26 @@ X = df.iloc[:, :4].values
 X_scaled = StandardScaler().fit_transform(X)
 
 # Output directory
-output_dir = Path("submission_hdbscan_raw")
+output_dir = Path("submission_hdbscan_fine")
 output_dir.mkdir(exist_ok=True)
 
-# Parameter grid
-min_cluster_sizes = [5, 8, 10, 12, 15]
-min_samples_list = [3, 5, 7, 10]
+# Fine-tuned grid near best config
+min_cluster_sizes = [13, 14, 15, 16, 17]
+min_samples_list = [6, 7, 8]
+metrics = ['euclidean', 'manhattan', 'cosine']
 
 i = 0
 for cs in min_cluster_sizes:
     for s in min_samples_list:
-        clusterer = hdbscan.HDBSCAN(min_cluster_size=cs, min_samples=s)
-        labels = clusterer.fit_predict(X_scaled)
-
-        filename = f"{i:03d}_cs{cs}_s{s}.csv"
-        submission = pd.DataFrame({'id': np.arange(len(labels)), 'label': labels})
-        submission.to_csv(output_dir / filename, index=False)
-        print(f"[{i:03d}] Saved {filename}")
-        i += 1
+        for metric in metrics:
+            try:
+                clusterer = hdbscan.HDBSCAN(min_cluster_size=cs, min_samples=s, metric=metric)
+                labels = clusterer.fit_predict(X_scaled)
+                filename = f"{i:03d}_cs{cs}_s{s}_m{metric}.csv"
+                submission = pd.DataFrame({'id': np.arange(len(labels)), 'label': labels})
+                submission.to_csv(output_dir / filename, index=False)
+                print(f"[{i:03d}] Saved {filename}")
+                i += 1
+            except Exception as e:
+                print(f"[{i:03d}] Failed cs={cs}, s={s}, metric={metric} → {e}")
+                i += 1
