@@ -10,8 +10,13 @@ X = df.iloc[:, 1:5].values  # Columns S1 to S4 (excluding 'id')
 # Scale the data
 X_scaled = StandardScaler().fit_transform(X)
 
-# Run Gaussian Mixture Model with 15 clusters
-gmm = GaussianMixture(n_components=15, covariance_type='full', random_state=42)
+# Best GMM configuration
+gmm = GaussianMixture(
+    n_components=13,
+    covariance_type='tied',
+    reg_covar=1e-5,
+    random_state=42
+)
 labels = gmm.fit_predict(X_scaled)
 
 # Save to public_submission.csv
@@ -21,4 +26,4 @@ submission = pd.DataFrame({
 })
 submission.to_csv("public_submission.csv", index=False)
 
-print("✅ GMM clustering complete. Output saved to public_submission.csv.")
+print("✅ Best GMM clustering complete. Output saved to public_submission.csv.")
