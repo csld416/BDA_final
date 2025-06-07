@@ -4,7 +4,7 @@ from grader import score
 from pathlib import Path
 
 # Setup
-input_dir = Path("submission_gmm_grid")
+input_dir = Path("submission_pca_gmm")
 log_file = Path("score_log.csv")
 public_file = Path("public_submission.csv")
 
