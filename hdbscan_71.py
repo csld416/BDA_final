@@ -11,11 +11,11 @@ warnings.filterwarnings('ignore')
 
 # Configuration
 PUBLIC_DATA_PATH = 'public_data.csv'
-PRIVATE_DATA_PATH = 'private_data.csv'
+# PRIVATE_DATA_PATH = 'private_data.csv'
 OUTPUT_DIR = Path('submission_hdbscan_umap')
 OUTPUT_DIR.mkdir(exist_ok=True)
 PUBLIC_N_DIM = 4
-PRIVATE_N_DIM = 6
+# PRIVATE_N_DIM = 6
 
 def load_and_preprocess_data(file_path, n_dim):
     df = pd.read_csv(file_path)
@@ -68,15 +68,15 @@ def main():
     visualize_pairwise(df_public, 1, 2, labels_public, 'Public Dataset: Dimension 2 vs 3', OUTPUT_DIR / 'public_dim2_vs_dim3.png')
     save_submission(labels_public, OUTPUT_DIR / 'public_submission.csv')
 
-    print('Processing private dataset...')
-    X_private, df_private = load_and_preprocess_data(PRIVATE_DATA_PATH, PRIVATE_N_DIM)
-    X_private_2d = reduce_dimensions(X_private, n_components=2)
-    labels_private = cluster_data(X_private, min_cluster_size=10, min_samples=5)
-    visualize_clusters(X_private_2d, labels_private, 'Private Dataset Clusters (UMAP)', OUTPUT_DIR / 'private_umap_clusters.png')
-    visualize_pairwise(df_private, 1, 2, labels_private, 'Private Dataset: Dimension 2 vs 3', OUTPUT_DIR / 'private_dim2_vs_dim3.png')
-    save_submission(labels_private, OUTPUT_DIR / 'private_submission.csv')
+    # print('Processing private dataset...')
+    # X_private, df_private = load_and_preprocess_data(PRIVATE_DATA_PATH, PRIVATE_N_DIM)
+    # X_private_2d = reduce_dimensions(X_private, n_components=2)
+    # labels_private = cluster_data(X_private, min_cluster_size=10, min_samples=5)
+    # visualize_clusters(X_private_2d, labels_private, 'Private Dataset Clusters (UMAP)', OUTPUT_DIR / 'private_umap_clusters.png')
+    # visualize_pairwise(df_private, 1, 2, labels_private, 'Private Dataset: Dimension 2 vs 3', OUTPUT_DIR / 'private_dim2_vs_dim3.png')
+    # save_submission(labels_private, OUTPUT_DIR / 'private_submission.csv')
 
-    print('Processing complete. Check submission_hdbscan_umap folder for outputs.')
+    print('Public dataset processing complete.')
 
 if __name__ == '__main__':
     main()
